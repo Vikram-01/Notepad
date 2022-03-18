@@ -1,0 +1,92 @@
+from cProfile import label
+from tkinter import *
+from tkinter import messagebox
+import tkinter.scrolledtext as scrolledtext 
+from tkinter.filedialog import askopenfilename, asksaveasfilename 
+from datetime import datetime
+import os
+root = Tk()
+
+root.title("Notepad ") 
+root.geometry("400x400+350+40")
+
+TextArea= scrolledtext.ScrolledText (root, font="lucida 13") 
+TextArea.pack (expand=True, fill=BOTH) 
+file = None 
+MenuBar = Menu(root)
+FileMenu = Menu(MenuBar, tearoff=0) 
+EditMenu = Menu (MenuBar , tearoff=0)
+
+HelpMenu = Menu (MenuBar , tearoff=0)
+MenuBar.add_cascade (label="File", menu=FileMenu)
+MenuBar.add_cascade(label="Edit",menu=EditMenu) 
+MenuBar.add_cascade(label="Help",menu=HelpMenu) 
+
+root.config(menu=MenuBar) 
+
+def newFile():
+    global file
+    root.title("Untitled Notepad")
+    TextArea.delete (1.0, END)
+
+def openFile(): 
+    global file
+    file = askopenfilename(defaultextension =".txt", filetypes=[("Text Documents", "*.txt")])
+    if file == "":
+         file = None
+
+    else:
+        root.title(os.path.basename(file) +"- Notepad")
+        f=open(file,"r")
+        TextArea.insert(1.0, f.read())
+        f.close()
+
+def saveFile(): 
+    global file
+    if file == None:
+        file = asksaveasfilename(defaultextension=", txt", filetypes=[("ALL Files","."),("Text Documents","txt")]) 
+        if file == "":
+           file = None
+        else:
+            f = open(file, "w") 
+            f.write(TextArea.get(1.0, END))
+            f.close()
+            root.title(os.path.basename(file)+" Notepad ")
+    else:
+        f = open(file, "w")
+        f.write(TextArea.get(1.0, END)) 
+        f.close()
+
+def exitFile():
+    root.destroy()
+
+def cut():
+    TextArea.event_generate(("<<Cut>>" )) 
+def copy():
+    TextArea.event_generate(("<<Copy>>")) 
+def paste():
+    TextArea.event_generate(("<<Paste>>")) 
+
+def clear():
+    TextArea.event_generate(("<<Clear>>")) 
+
+def time1():     #edit menu Time/Date option
+    now = datetime.now()
+    dtString = now.strftime("%d/%m/%Y %H:%M:%S")
+    label = messagebox.showinfo("Time/Date", dtString)
+
+def about():
+    label = messagebox.showinfo("Notepad by _VIKRAM_")
+
+FileMenu.add_command(label="New" , command=newFile)
+FileMenu.add_command (label="Open" , command = openFile) 
+FileMenu.add_command(label="Save", command = saveFile)
+FileMenu.add_command(label = "Exit" , command = exitFile)
+EditMenu.add_command(label = "Cut", command = cut) 
+EditMenu.add_command(label="Copy", command = copy)
+EditMenu.add_command(label = "Paste", command = paste)
+EditMenu.add_command(label = "Clear", command = clear)
+HelpMenu.add_command(label = "About", command = about)
+HelpMenu.add_command(label = "Time", command = time1)
+
+root.mainloop()
